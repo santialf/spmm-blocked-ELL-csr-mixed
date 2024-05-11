@@ -536,6 +536,7 @@ int main(int argc, char *argv[]) {
     struct timespec t_start, t_end;
     double elapsedTime;
     double searchTime1 = 0, searchTime2 = 0;
+    double tflops_csr = 0, tflops_bell = 0;
     float blockDensity = 0;
     int numRuns=0;
 
@@ -561,6 +562,7 @@ int main(int argc, char *argv[]) {
     	blockDensity = (float) ctr2/A_num_blocks;
         clock_gettime(CLOCK_MONOTONIC, &t_end); // final timestamp
         searchTime1 = ((t_end.tv_sec + ((double) t_end.tv_nsec / 1000000000)) - (t_start.tv_sec + ((double) t_start.tv_nsec / 1000000000))) / numRuns;
+        tflops_bell = (2 * ((double)A_ell_cols) * ((double)A_num_rows) * ((double)B_num_cols) / 1000000000000) / searchTime1;
     }
     
     // execute csr SpMM
@@ -592,10 +594,11 @@ int main(int argc, char *argv[]) {
         }
         clock_gettime(CLOCK_MONOTONIC, &t_end); // final timestamp
         searchTime2 = ((t_end.tv_sec + ((double) t_end.tv_nsec / 1000000000)) - (t_start.tv_sec + ((double) t_start.tv_nsec / 1000000000))) / numRuns;
+        tflops_csr = (2 * ((double)ctr1 * B_num_cols) / 1000000000000) / searchTime2;
     }
 
     std::cout << argv[1];
-    printf(" Time (seconds) BELL:\t%.6f (nnzs per block: %.1f)\tCSR:\t%.6f\tTotal:\t%.6f\n", searchTime1, blockDensity, searchTime2, searchTime1 + searchTime2);
+    printf(" Time (seconds) (TFLOPS) BELL:\t%.6f (nnzs per block: %.1f // perf: %.6f)\tCSR:\t%.6f (perf: %.6f)\tTotal:\t%.6f\n", searchTime1, blockDensity, tflops_bell, searchTime2, tflops_csr, searchTime1 + searchTime2);
 
     // destroy matrix/vector descriptors
     CHECK_CUSPARSE( cusparseDestroySpMat(matA2) )
