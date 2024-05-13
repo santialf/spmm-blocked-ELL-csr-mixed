@@ -597,7 +597,7 @@ int main(int argc, char *argv[]) {
         tflops_csr = (2 * ((double)ctr1 * B_num_cols) / 1000000000000) / searchTime2;
     }
 
-    std::cout << argv[1];
+    std::cout << argv[1] << " " << argv[2];
     printf(" Time (seconds) (TFLOPS) BELL:\t%.6f (nnzs per block: %.1f // perf: %.6f)\tCSR:\t%.6f (perf: %.6f)\tTotal:\t%.6f\n", searchTime1, blockDensity, tflops_bell, searchTime2, tflops_csr, searchTime1 + searchTime2);
 
     // destroy matrix/vector descriptors
